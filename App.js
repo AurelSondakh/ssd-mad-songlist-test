@@ -11,6 +11,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Hello, React Native!</Text>
+      <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 20 }}>Hello, React Native!</Text>
     </View>
   );
 };
