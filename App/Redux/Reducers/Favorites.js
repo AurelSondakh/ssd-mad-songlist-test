@@ -1,4 +1,3 @@
-// favoritesSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NotificationService from '../../Utility/NotificationService';
@@ -9,12 +8,12 @@ export const loadFavorites = createAsyncThunk('favorites/loadFavorites', async (
     return favorites ? JSON.parse(favorites) : [];
   } catch (error) {
     console.error('Error loading favorites from AsyncStorage:', error);
-    return []; // Return empty array if there's an error
+    return [];
   }
 });
 
 export const toggleFavorite = createAsyncThunk('favorites/toggleFavorite', async (music, { getState }) => {
-  let favorites = getState().favorites.slice(); // Clone the array
+  let favorites = getState().favorites.slice();
   const index = favorites.findIndex((fav) => fav.trackId === music.trackId);
   let notificationMessage = '';
 
@@ -36,7 +35,7 @@ export const toggleFavorite = createAsyncThunk('favorites/toggleFavorite', async
     return favorites;
   } catch (error) {
     console.error('Error storing favorites in AsyncStorage:', error);
-    throw error; // Propagate the error
+    throw error;
   }
 });
 

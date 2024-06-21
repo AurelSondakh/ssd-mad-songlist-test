@@ -90,6 +90,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile file('spotfy.keystore')
+            storePassword 'musicisgood'
+            keyAlias 'spotfy'
+            keyPassword 'musicisgood'
+        }
     }
     buildTypes {
         debug {
