@@ -7,6 +7,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SearchPage from '../Containers/SearchPage';
 import FavoritesPage from '../Containers/FavoritesPage';
+import SongDetailScreen from '../Containers/SongDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -72,6 +73,7 @@ const AppNavigator = () => {
         <NavigationContainer>
             <Stack.Navigator initialRouteName='BottomTabNavigator'>
                 <Stack.Screen name="BottomTabNavigator" component={TabBar} options={{ headerShown: false }} />
+                <Stack.Screen name="SongDetailScreen" component={SongDetailScreen} options={{ headerShown: false }} />
             </Stack.Navigator>
         </NavigationContainer>
     );
