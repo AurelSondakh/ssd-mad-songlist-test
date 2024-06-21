@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "692679287461",
+    "project_id": "spotfy-cf638",
+    "storage_bucket": "spotfy-cf638.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:692679287461:android:ef9b21ca0c0a716969a34c",
+        "android_client_info": {
+          "package_name": "com.spotfy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFpuS_e68q-qeq8jZm0gS4pxxQuS4AyvU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
