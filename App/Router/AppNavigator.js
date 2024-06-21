@@ -21,16 +21,17 @@ const AppNavigator = () => {
                     screenOptions={{
                         tabBarLabelStyle: { display: 'none' },
                         tabBarStyle: {
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                          borderTopWidth: 0,
-                          position: 'absolute',
-                          height: 64,
-                          flex: 1,
+                            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                            borderTopWidth: 0,
+                            position: 'absolute',
+                            height: 64
                         },
                         tabBarItemStyle: {
                             backgroundColor: 'rgba(0, 0, 0, 0.5)'
-                        }
+                        },
+                        tabBarHideOnKeyboard: true
                     }}
+                    
                 >
                     <Tab.Screen
                         name='Search' component={SearchPage} options={{

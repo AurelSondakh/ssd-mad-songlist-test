@@ -1,43 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StatusBar, Platform, TextInput, Image, ScrollView, FlatList } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { View, Text, StatusBar, Platform, TextInput, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import musicCover from '../Assets/Image/music_cover.jpg'
-import musicVideoCover from '../Assets/Image/music_video_cover.jpg'
-import artistCover from '../Assets/Image/artist_cover.jpg'
-import { ActionMusic } from "../Redux/Actions";
-import Spinner from 'react-native-loading-spinner-overlay';
 
 // Components
-import SearchCategoryComponent from "../Components/SearchCategoryComponent";
-import SongList from "../Components/SongList";
-import ArtistList from "../Components/ArtistList";
-import ErrorModal from "../Components/ErrorModal";
+import HomeSearchViewComponent from "../Components/HomeSearchViewComponent";
+import SearchingViewComponent from "../Components/SearchingViewComponent";
+import SearchingResultViewComponent from "../Components/SearchResultViewComponent";
 
 const SearchPage = () => {
+    const navigation = useNavigation();
+    const [isTextInputFocused, setIsTextInputFocused] = useState(false);
+    const [searchInput, setSearchInput] = useState('')
+    const [searchedStatus, setSearchedStatus] = useState(false)
+    const [endEditing, setEndEditing] = useState(false)
+    const [entity, setEntity] = useState('All')
 
-    const navigation = useNavigation()
-    const dispatch = useDispatch();
-    const { reccomendedStationListArtist, reccomendedStationListSong, musicSpinner, errorModal } = useSelector((state) => state.music);
-
-    const getRecommendedStation = () => {
-        try {
-            let term = encodeURIComponent('The Chainsmokers').replace(/%20/g, '+');
-            dispatch(
-                ActionMusic.GetRecommendedStation(term),
-            );
-        } catch (error) {
-            console.log('Error Get Recommended Station: ', error);
+    const handleSubmit = () => {
+        if (searchInput !== '') {
+            setSearchedStatus(true)
         }
     }
-
-    useEffect(() => {
-        getRecommendedStation()
-    }, [])
-
-    console.log('Artist ', reccomendedStationListArtist)
-    console.log('Song ', reccomendedStationListSong)
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -51,70 +34,59 @@ const SearchPage = () => {
 
     return (
         <ScrollView style={{ flex: 1, backgroundColor: '#000', paddingHorizontal: 15, paddingTop: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-                <Image source={require('../Assets/Image/splash_image.png')} style={{
-                    height: 40,
-                    width: 40,
-                    resizeMode: 'contain',
-                    marginRight: 15
-                }} />
-                <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 24, color: '#FFF' }}>Search</Text>
-            </View>
-            <View style={{ backgroundColor: '#FFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, borderRadius: 10 }}>
-                <AntDesign name={'search1'} color={'#000'} size={24} />
+            {!isTextInputFocused
+                ? <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                    <Image source={require('../Assets/Image/splash_image.png')} style={{
+                        height: 40,
+                        width: 40,
+                        resizeMode: 'contain',
+                        marginRight: 15
+                    }} />
+                    <Text style={{ fontFamily: 'Poppins-Bold', fontSize: 24, color: '#FFF' }}>Search</Text>
+                </View>
+                : null
+            }
+            <View style={{ backgroundColor: isTextInputFocused ? '#282828' : '#FFF', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, borderRadius: 10 }}>
+                {isTextInputFocused
+                    ? <TouchableOpacity onPress={() => { setIsTextInputFocused(false); setSearchedStatus(false); setSearchInput('') }}>
+                        <AntDesign name={'arrowleft'} color={'#FFF'} size={24} />
+                    </TouchableOpacity>
+                    :
+                    <AntDesign name={'search1'} color={'#000'} size={24} />
+                }
                 <TextInput
                     placeholder="What do you want to listen to?"
-                    placeholderTextColor={'#4E4E4E'}
+                    placeholderTextColor={isTextInputFocused ? '#A6A6A6' : '#4E4E4E'}
                     style={{
                         fontFamily: 'Poppins-SemiBold',
                         fontSize: 13,
-                        marginLeft: 3,
-                        flex: 1
+                        marginLeft: 5,
+                        flex: 1,
+                        color: '#FFF'
                     }}
+                    onFocus={() => {setIsTextInputFocused(true)}}
+                    onBlur={handleSubmit}
+                    value={searchInput}
+                    onChangeText={(e) => setSearchInput(e)}
+                    onSubmitEditing={handleSubmit}
+                    onEndEditing={() => setEndEditing(true)}
                 />
+                {searchInput !== ''
+                    ? <TouchableOpacity onPress={() => { setSearchInput(''); setSearchedStatus(false) }}>
+                        <AntDesign name={'close'} color={'#FFF'} size={24} />
+                    </TouchableOpacity>
+                    : null
+                }
             </View>
-            <Text style={{ marginVertical: 15, color: '#FFF', fontFamily: 'Poppins-SemiBold' }}>Start browsing</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 15, marginBottom: 15 }}>
-                <SearchCategoryComponent text={'Music'} color={'#DB148B'} cover={musicCover} />
-                <SearchCategoryComponent text={'Music Video'} color={'#016450'} cover={musicVideoCover} />
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 15 }}>
-                <SearchCategoryComponent text={'Artist'} color={'#8400E7'} cover={artistCover} />
-                <SearchCategoryComponent />
-            </View>
-            <Text style={{ marginTop: 15, color: '#FFF', fontFamily: 'Poppins-SemiBold' }}>Recommended Stations</Text>
-            <Text style={{ marginTop: 5, color: '#FFF', fontFamily: 'Poppins-SemiBold', fontSize: 24 }}>Artists</Text>
-            <View style={{ marginTop: 5 }}>
-                {!errorModal
-                    ? <FlatList
-                        nestedScrollEnabled={false}
-                        data={reccomendedStationListArtist?.results}
-                        renderItem={({ index, item }) => <ArtistList item={item} />}
-                        keyExtractor={(item) => `${item.artistId}`}
-                    />
-                    : <ErrorModal method={getRecommendedStation} />}
-            </View>
-            <Text style={{ marginTop: 5, color: '#FFF', fontFamily: 'Poppins-SemiBold', fontSize: 24 }}>Songs</Text>
-            <View style={{ marginTop: 5 }}>
-                {!errorModal
-                    ? <FlatList
-                        style={{}}
-                        nestedScrollEnabled={false}
-                        data={reccomendedStationListSong?.results}
-                        renderItem={({ index, item }) => <SongList item={item} />}
-                        keyExtractor={(item) => `${item.trackId}`}
-                    />
-                    : <ErrorModal method={getRecommendedStation} />}
-            </View>
-            <Spinner
-                testID="spinner"
-                visible={musicSpinner}
-                textContent={'Loading...'}
-                textStyle={{ color: '#FFF' }}
-            />
+            {(isTextInputFocused && !searchedStatus)
+                ? <SearchingViewComponent />
+                : searchedStatus
+                    ? <SearchingResultViewComponent term={searchInput} endEditing={endEditing} setEndEditing={setEndEditing} entity={entity} />
+                    : <HomeSearchViewComponent setIsTextInputFocused={setIsTextInputFocused} setSearchedStatus={setSearchedStatus} setEntity={setEntity} />
+            }
             <View style={{ height: 80 }} />
         </ScrollView>
     )
 }
 
-export default SearchPage
+export default SearchPage;
