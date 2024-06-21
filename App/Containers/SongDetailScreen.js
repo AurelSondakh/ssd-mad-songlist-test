@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { View, Text, StatusBar, ImageBackground, Dimensions, Platform, TouchableOpacity, Image, Linking } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleFavorite } from "../Redux/Reducers/Favorites";
 
 const SongDetailScreen = (props) => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
     const item = props?.route?.params?.item;
+    const favorites = useSelector((state) => state.favorites);
     const screenWidth = Dimensions.get('screen').width;
     const highResArtworkUrl = item?.artworkUrl100.replace('100x100', `600x600`);
     const releaseDate = new Date(item?.releaseDate).toLocaleDateString('en-GB', {
@@ -24,6 +27,11 @@ const SongDetailScreen = (props) => {
             Linking.openURL(item.trackViewUrl);
         }
     };
+
+    const handleFavoritePress = () => {
+        dispatch(toggleFavorite(item));
+    };
+    const isFavorite = favorites.some(fav => fav.trackId === item.trackId);
 
     useEffect(() => {
         const handleFocus = () => {
@@ -66,8 +74,8 @@ const SongDetailScreen = (props) => {
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <AntDesign name={'arrowleft'} color={'#FFF'} size={24} />
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <AntDesign name={'hearto'} color={'#1DB954'} size={24} />
+                        <TouchableOpacity onPress={handleFavoritePress}>
+                            <AntDesign name={isFavorite ? 'heart' : 'hearto'} color={'#1DB954'} size={24} />
                         </TouchableOpacity>
                     </View>
                 </View>
