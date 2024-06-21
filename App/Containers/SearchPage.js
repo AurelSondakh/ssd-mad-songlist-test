@@ -1,18 +1,43 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StatusBar, Platform, TextInput, Image, ScrollView } from 'react-native';
+import { View, Text, StatusBar, Platform, TextInput, Image, ScrollView, FlatList } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import musicCover from '../Assets/Image/music_cover.jpg'
 import musicVideoCover from '../Assets/Image/music_video_cover.jpg'
 import artistCover from '../Assets/Image/artist_cover.jpg'
+import { ActionMusic } from "../Redux/Actions";
+import Spinner from 'react-native-loading-spinner-overlay';
 
 // Components
 import SearchCategoryComponent from "../Components/SearchCategoryComponent";
+import SongList from "../Components/SongList";
+import ArtistList from "../Components/ArtistList";
+import ErrorModal from "../Components/ErrorModal";
 
 const SearchPage = () => {
 
     const navigation = useNavigation()
+    const dispatch = useDispatch();
+    const { reccomendedStationListArtist, reccomendedStationListSong, musicSpinner, errorModal } = useSelector((state) => state.music);
+
+    const getRecommendedStation = () => {
+        try {
+            let term = encodeURIComponent('The Chainsmokers').replace(/%20/g, '+');
+            dispatch(
+                ActionMusic.GetRecommendedStation(term),
+            );
+        } catch (error) {
+            console.log('Error Get Recommended Station: ', error);
+        }
+    }
+
+    useEffect(() => {
+        getRecommendedStation()
+    }, [])
+
+    console.log('Artist ', reccomendedStationListArtist)
+    console.log('Song ', reccomendedStationListSong)
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -57,7 +82,37 @@ const SearchPage = () => {
                 <SearchCategoryComponent text={'Artist'} color={'#8400E7'} cover={artistCover} />
                 <SearchCategoryComponent />
             </View>
-            <Text style={{ marginVertical: 15, color: '#FFF', fontFamily: 'Poppins-SemiBold' }}>Recommended Stations</Text>
+            <Text style={{ marginTop: 15, color: '#FFF', fontFamily: 'Poppins-SemiBold' }}>Recommended Stations</Text>
+            <Text style={{ marginTop: 5, color: '#FFF', fontFamily: 'Poppins-SemiBold', fontSize: 24 }}>Artists</Text>
+            <View style={{ marginTop: 5 }}>
+                {!errorModal
+                    ? <FlatList
+                        nestedScrollEnabled={false}
+                        data={reccomendedStationListArtist?.results}
+                        renderItem={({ index, item }) => <ArtistList item={item} />}
+                        keyExtractor={(item) => `${item.artistId}`}
+                    />
+                    : <ErrorModal method={getRecommendedStation} />}
+            </View>
+            <Text style={{ marginTop: 5, color: '#FFF', fontFamily: 'Poppins-SemiBold', fontSize: 24 }}>Songs</Text>
+            <View style={{ marginTop: 5 }}>
+                {!errorModal
+                    ? <FlatList
+                        style={{}}
+                        nestedScrollEnabled={false}
+                        data={reccomendedStationListSong?.results}
+                        renderItem={({ index, item }) => <SongList item={item} />}
+                        keyExtractor={(item) => `${item.trackId}`}
+                    />
+                    : <ErrorModal method={getRecommendedStation} />}
+            </View>
+            <Spinner
+                testID="spinner"
+                visible={musicSpinner}
+                textContent={'Loading...'}
+                textStyle={{ color: '#FFF' }}
+            />
+            <View style={{ height: 80 }} />
         </ScrollView>
     )
 }
