@@ -1,8 +1,7 @@
-// NotificationService.js
 import PushNotification from 'react-native-push-notification';
 
 const NotificationService = (trackName, message, image) => {
-  const channelId = Date.now().toString(); // Unique channelId for each notification
+  const channelId = Date.now().toString();
 
   PushNotification.createChannel(
     {
@@ -19,7 +18,7 @@ const NotificationService = (trackName, message, image) => {
     channelId: channelId,
     title: trackName,
     message: message,
-    largeIconUrl: image, // Use largeIconUrl for displaying images
+    largeIconUrl: image,
   });
 };
 
